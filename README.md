@@ -53,7 +53,7 @@ Runtime: **Node 24 (recommended) or Node 22.16+**.
 
 ### From GitHub repository
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/openclaw/openclaw/main/scripts/install.sh | bash
+curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/yaowenjie0805-sys/openclaw/main/scripts/install.sh | bash
 
 soloclaw onboard --install-daemon
 ```
