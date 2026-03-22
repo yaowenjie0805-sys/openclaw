@@ -51,7 +51,8 @@ export function renderChannels(props: ChannelsProps) {
     });
 
   return html`
-    <section class="grid grid-cols-2">
+    <!-- Channels Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
       ${orderedChannels.map((channel) =>
         renderChannel(channel.key, props, {
           whatsapp,
@@ -65,27 +66,29 @@ export function renderChannels(props: ChannelsProps) {
           channelAccounts: props.snapshot?.channelAccounts ?? null,
         }),
       )}
-    </section>
+    </div>
 
-    <section class="card" style="margin-top: 18px;">
-      <div class="row" style="justify-content: space-between;">
-        <div>
-          <div class="card-title">Channel health</div>
-          <div class="card-sub">Channel status snapshots from the gateway.</div>
+    <!-- Channel Health -->
+    <div class="admin-card" style="margin-top: 24px;">
+      <div class="admin-card-header">
+        <div class="admin-card-title">Channel Health</div>
+        <div style="font-size: 14px; color: var(--admin-text-secondary);">
+          ${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}
         </div>
-        <div class="muted">${props.lastSuccessAt ? formatRelativeTimestamp(props.lastSuccessAt) : "n/a"}</div>
       </div>
       ${
         props.lastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">
+          ? html`<div style="margin-top: 16px; padding: 12px; background: #fee2e2; border-radius: 8px; border: 1px solid #fca5a5; color: #991b1b;">
             ${props.lastError}
           </div>`
           : nothing
       }
-      <pre class="code-block" style="margin-top: 12px;">
+      <div style="margin-top: 16px; padding: 16px; background: var(--admin-bg-color); border-radius: 8px; border: 1px solid var(--admin-border-color);">
+        <pre style="margin: 0; font-family: var(--mono); font-size: 14px; line-height: 1.5; overflow-x: auto;">
 ${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
-      </pre>
-    </section>
+        </pre>
+      </div>
+    </div>
   `;
 }
 
@@ -192,45 +195,48 @@ function renderGenericChannelCard(
   const accountCountLabel = renderChannelAccountCount(key, channelAccounts);
 
   return html`
-    <div class="card">
-      <div class="card-title">${label}</div>
-      <div class="card-sub">Channel status and configuration.</div>
-      ${accountCountLabel}
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <div class="admin-card-title">${label}</div>
+      </div>
+      <div style="margin-top: 16px;">
+        ${accountCountLabel}
 
-      ${
-        accounts.length > 0
-          ? html`
-            <div class="account-card-list">
-              ${accounts.map((account) => renderGenericAccount(account))}
-            </div>
-          `
-          : html`
-            <div class="status-list" style="margin-top: 16px;">
-              <div>
-                <span class="label">Configured</span>
-                <span>${configured == null ? "n/a" : configured ? "Yes" : "No"}</span>
+        ${
+          accounts.length > 0
+            ? html`
+              <div style="margin-top: 16px;">
+                ${accounts.map((account) => renderGenericAccount(account))}
               </div>
-              <div>
-                <span class="label">Running</span>
-                <span>${running == null ? "n/a" : running ? "Yes" : "No"}</span>
+            `
+            : html`
+              <div style="margin-top: 16px; padding: 16px; background: var(--admin-bg-color); border-radius: 8px; border: 1px solid var(--admin-border-color);">
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px; margin-bottom: 8px;">
+                  <div style="font-weight: 500; color: var(--admin-text-secondary);">Configured</div>
+                  <div style="color: var(--admin-text-primary);">${configured == null ? "n/a" : configured ? "Yes" : "No"}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px; margin-bottom: 8px;">
+                  <div style="font-weight: 500; color: var(--admin-text-secondary);">Running</div>
+                  <div style="color: var(--admin-text-primary);">${running == null ? "n/a" : running ? "Yes" : "No"}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px;">
+                  <div style="font-weight: 500; color: var(--admin-text-secondary);">Connected</div>
+                  <div style="color: var(--admin-text-primary);">${connected == null ? "n/a" : connected ? "Yes" : "No"}</div>
+                </div>
               </div>
-              <div>
-                <span class="label">Connected</span>
-                <span>${connected == null ? "n/a" : connected ? "Yes" : "No"}</span>
-              </div>
-            </div>
-          `
-      }
+            `
+        }
 
-      ${
-        lastError
-          ? html`<div class="callout danger" style="margin-top: 12px;">
-            ${lastError}
-          </div>`
-          : nothing
-      }
+        ${
+          lastError
+            ? html`<div style="margin-top: 16px; padding: 12px; background: #fee2e2; border-radius: 8px; border: 1px solid #fca5a5; color: #991b1b;">
+              ${lastError}
+            </div>`
+            : nothing
+        }
 
-      ${renderChannelConfigSection({ channelId: key, props })}
+        ${renderChannelConfigSection({ channelId: key, props })}
+      </div>
     </div>
   `;
 }
@@ -288,38 +294,36 @@ function renderGenericAccount(account: ChannelAccountSnapshot) {
   const connectedStatus = deriveConnectedStatus(account);
 
   return html`
-    <div class="account-card">
-      <div class="account-card-header">
-        <div class="account-card-title">${account.name || account.accountId}</div>
-        <div class="account-card-id">${account.accountId}</div>
+    <div style="padding: 16px; background: var(--admin-bg-color); border-radius: 8px; border: 1px solid var(--admin-border-color); margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div style="font-weight: 600; color: var(--admin-text-primary);">${account.name || account.accountId}</div>
+        <div style="font-size: 12px; color: var(--admin-text-secondary);">${account.accountId}</div>
       </div>
-      <div class="status-list account-card-status">
-        <div>
-          <span class="label">Running</span>
-          <span>${runningStatus}</span>
-        </div>
-        <div>
-          <span class="label">Configured</span>
-          <span>${account.configured ? "Yes" : "No"}</span>
-        </div>
-        <div>
-          <span class="label">Connected</span>
-          <span>${connectedStatus}</span>
-        </div>
-        <div>
-          <span class="label">Last inbound</span>
-          <span>${account.lastInboundAt ? formatRelativeTimestamp(account.lastInboundAt) : "n/a"}</span>
-        </div>
-        ${
-          account.lastError
-            ? html`
-              <div class="account-card-error">
-                ${account.lastError}
-              </div>
-            `
-            : nothing
-        }
+      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px; margin-bottom: 8px;">
+        <div style="font-weight: 500; color: var(--admin-text-secondary);">Running</div>
+        <div style="color: var(--admin-text-primary);">${runningStatus}</div>
       </div>
+      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px; margin-bottom: 8px;">
+        <div style="font-weight: 500; color: var(--admin-text-secondary);">Configured</div>
+        <div style="color: var(--admin-text-primary);">${account.configured ? "Yes" : "No"}</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px; margin-bottom: 8px;">
+        <div style="font-weight: 500; color: var(--admin-text-secondary);">Connected</div>
+        <div style="color: var(--admin-text-primary);">${connectedStatus}</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px;">
+        <div style="font-weight: 500; color: var(--admin-text-secondary);">Last inbound</div>
+        <div style="color: var(--admin-text-primary);">${account.lastInboundAt ? formatRelativeTimestamp(account.lastInboundAt) : "n/a"}</div>
+      </div>
+      ${
+        account.lastError
+          ? html`
+            <div style="margin-top: 12px; padding: 10px; background: #fee2e2; border-radius: 6px; border: 1px solid #fca5a5; color: #991b1b; font-size: 14px;">
+              ${account.lastError}
+            </div>
+          `
+          : nothing
+      }
     </div>
   `;
 }

@@ -2,25 +2,12 @@ import { t } from "../i18n/index.ts";
 import type { IconName } from "./icons.js";
 
 export const TAB_GROUPS = [
-  { label: "chat", tabs: ["chat"] },
-  {
-    label: "control",
-    tabs: ["overview", "channels", "instances", "sessions", "usage", "cron"],
-  },
-  { label: "agent", tabs: ["agents", "skills", "nodes"] },
-  {
-    label: "settings",
-    tabs: [
-      "config",
-      "communications",
-      "appearance",
-      "automation",
-      "infrastructure",
-      "aiAgents",
-      "debug",
-      "logs",
-    ],
-  },
+  { label: "dashboard", tabs: ["overview"] },
+  { label: "communications", tabs: ["chat", "channels", "instances"] },
+  { label: "agents", tabs: ["agents", "skills", "nodes"] },
+  { label: "system", tabs: ["sessions", "usage", "cron"] },
+  { label: "configuration", tabs: ["config", "appearance", "automation", "infrastructure", "aiAgents"] },
+  { label: "monitoring", tabs: ["debug", "logs"] },
 ] as const;
 
 export type Tab =
@@ -148,43 +135,43 @@ export function inferBasePathFromPathname(pathname: string): string {
 export function iconForTab(tab: Tab): IconName {
   switch (tab) {
     case "agents":
-      return "folder";
+      return "users";
     case "chat":
       return "messageSquare";
     case "overview":
-      return "barChart";
+      return "home";
     case "channels":
-      return "link";
+      return "layers";
     case "instances":
-      return "radio";
+      return "server";
     case "sessions":
-      return "fileText";
+      return "clock";
     case "usage":
-      return "barChart";
+      return "pieChart";
     case "cron":
-      return "loader";
+      return "calendar";
     case "skills":
-      return "zap";
+      return "code";
     case "nodes":
       return "monitor";
     case "config":
       return "settings";
     case "communications":
-      return "send";
+      return "mail";
     case "appearance":
-      return "spark";
+      return "palette";
     case "automation":
-      return "terminal";
+      return "repeat";
     case "infrastructure":
-      return "globe";
+      return "network";
     case "aiAgents":
       return "brain";
     case "debug":
-      return "bug";
+      return "wrench";
     case "logs":
-      return "scrollText";
+      return "fileText";
     default:
-      return "folder";
+      return "grid";
   }
 }
 

@@ -195,34 +195,71 @@ export function renderOverview(props: OverviewProps) {
     : i18n.getLocale();
 
   return html`
-    <section class="grid">
-      <div class="card">
-        <div class="card-title">${t("overview.access.title")}</div>
-        <div class="card-sub">${t("overview.access.subtitle")}</div>
-        <div class="ov-access-grid" style="margin-top: 16px;">
-          <label class="field ov-access-grid__full">
-            <span>${t("overview.access.wsUrl")}</span>
-            <input
-              .value=${props.settings.gatewayUrl}
-              @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSettingsChange({
-                  ...props.settings,
-                  gatewayUrl: v,
-                  token: v.trim() === props.settings.gatewayUrl.trim() ? props.settings.token : "",
-                });
-              }}
-              placeholder="ws://100.x.y.z:18789"
-            />
-          </label>
-          ${
-            isTrustedProxy
-              ? ""
-              : html`
-                <label class="field">
-                  <span>${t("overview.access.token")}</span>
+    <!-- Dashboard Stats Grid -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-value ${props.connected ? "ok" : "warn"}">
+          ${props.connected ? t("common.ok") : t("common.offline")}
+        </div>
+        <div class="admin-stat-label">${t("overview.snapshot.status")}</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-value">${uptime}</div>
+        <div class="admin-stat-label">${t("overview.snapshot.uptime")}</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-value">${tick}</div>
+        <div class="admin-stat-label">${t("overview.snapshot.tickInterval")}</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-value">
+          ${props.presenceCount}
+        </div>
+        <div class="admin-stat-label">${t("overview.snapshot.instances")}</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-value">
+          ${props.sessionsCount || 0}
+        </div>
+        <div class="admin-stat-label">${t("overview.snapshot.sessions")}</div>
+      </div>
+    </div>
+
+    <!-- Access Configuration -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <div class="admin-card-title">${t("overview.access.title")}</div>
+        <div class="admin-card-actions">
+          <button class="admin-btn admin-btn-primary" @click=${() => props.onConnect()}>${t("common.connect")}</button>
+          <button class="admin-btn admin-btn-secondary" @click=${() => props.onRefresh()}>${t("common.refresh")}</button>
+        </div>
+      </div>
+      <div class="admin-form">
+        <div class="admin-form-group">
+          <label class="admin-form-label">${t("overview.access.wsUrl")}</label>
+          <input
+            class="admin-form-input"
+            .value=${props.settings.gatewayUrl}
+            @input=${(e: Event) => {
+              const v = (e.target as HTMLInputElement).value;
+              props.onSettingsChange({
+                ...props.settings,
+                gatewayUrl: v,
+                token: v.trim() === props.settings.gatewayUrl.trim() ? props.settings.token : "",
+              });
+            }}
+            placeholder="ws://100.x.y.z:18789"
+          />
+        </div>
+        ${
+          isTrustedProxy
+            ? ""
+            : html`
+                <div class="admin-form-group">
+                  <label class="admin-form-label">${t("overview.access.token")}</label>
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <input
+                      class="admin-form-input"
                       type=${props.showGatewayToken ? "text" : "password"}
                       autocomplete="off"
                       style="flex: 1;"
@@ -235,8 +272,8 @@ export function renderOverview(props: OverviewProps) {
                     />
                     <button
                       type="button"
-                      class="btn btn--icon ${props.showGatewayToken ? "active" : ""}"
-                      style="width: 36px; height: 36px;"
+                      class="admin-btn admin-btn-secondary"
+                      style="width: 40px; height: 40px; padding: 0;"
                       title=${props.showGatewayToken ? "Hide token" : "Show token"}
                       aria-label="Toggle token visibility"
                       aria-pressed=${props.showGatewayToken}
@@ -245,11 +282,12 @@ export function renderOverview(props: OverviewProps) {
                       ${props.showGatewayToken ? icons.eye : icons.eyeOff}
                     </button>
                   </div>
-                </label>
-                <label class="field">
-                  <span>${t("overview.access.password")}</span>
+                </div>
+                <div class="admin-form-group">
+                  <label class="admin-form-label">${t("overview.access.password")}</label>
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <input
+                      class="admin-form-input"
                       type=${props.showGatewayPassword ? "text" : "password"}
                       autocomplete="off"
                       style="flex: 1;"
@@ -262,8 +300,8 @@ export function renderOverview(props: OverviewProps) {
                     />
                     <button
                       type="button"
-                      class="btn btn--icon ${props.showGatewayPassword ? "active" : ""}"
-                      style="width: 36px; height: 36px;"
+                      class="admin-btn admin-btn-secondary"
+                      style="width: 40px; height: 40px; padding: 0;"
                       title=${props.showGatewayPassword ? "Hide password" : "Show password"}
                       aria-label="Toggle password visibility"
                       aria-pressed=${props.showGatewayPassword}
@@ -272,60 +310,57 @@ export function renderOverview(props: OverviewProps) {
                       ${props.showGatewayPassword ? icons.eye : icons.eyeOff}
                     </button>
                   </div>
-                </label>
+                </div>
               `
-          }
-          <label class="field">
-            <span>${t("overview.access.sessionKey")}</span>
-            <input
-              .value=${props.settings.sessionKey}
-              @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSessionKeyChange(v);
-              }}
-            />
-          </label>
-          <label class="field">
-            <span>${t("overview.access.language")}</span>
-            <select
-              .value=${currentLocale}
-              @change=${(e: Event) => {
-                const v = (e.target as HTMLSelectElement).value as Locale;
-                void i18n.setLocale(v);
-                props.onSettingsChange({ ...props.settings, locale: v });
-              }}
-            >
-              ${SUPPORTED_LOCALES.map((loc) => {
-                const key = loc.replace(/-([a-zA-Z])/g, (_, c) => c.toUpperCase());
-                return html`<option value=${loc} ?selected=${currentLocale === loc}>
-                  ${t(`languages.${key}`)}
-                </option>`;
-              })}
-            </select>
-          </label>
+        }
+        <div class="admin-form-group">
+          <label class="admin-form-label">${t("overview.access.sessionKey")}</label>
+          <input
+            class="admin-form-input"
+            .value=${props.settings.sessionKey}
+            @input=${(e: Event) => {
+              const v = (e.target as HTMLInputElement).value;
+              props.onSessionKeyChange(v);
+            }}
+          />
         </div>
-        <div class="row" style="margin-top: 14px;">
-          <button class="btn" @click=${() => props.onConnect()}>${t("common.connect")}</button>
-          <button class="btn" @click=${() => props.onRefresh()}>${t("common.refresh")}</button>
-          <span class="muted">${
-            isTrustedProxy ? t("overview.access.trustedProxy") : t("overview.access.connectHint")
-          }</span>
+        <div class="admin-form-group">
+          <label class="admin-form-label">${t("overview.access.language")}</label>
+          <select
+            class="admin-form-select"
+            .value=${currentLocale}
+            @change=${(e: Event) => {
+              const v = (e.target as HTMLSelectElement).value as Locale;
+              void i18n.setLocale(v);
+              props.onSettingsChange({ ...props.settings, locale: v });
+            }}
+          >
+            ${SUPPORTED_LOCALES.map((loc) => {
+              const key = loc.replace(/-([a-zA-Z])/g, (_, c) => c.toUpperCase());
+              return html`<option value=${loc} ?selected=${currentLocale === loc}>
+                ${t(`languages.${key}`)}
+              </option>`;
+            })}
+          </select>
+        </div>
+        <div style="margin-top: 16px; font-size: 14px; color: var(--admin-text-secondary);">
+          ${isTrustedProxy ? t("overview.access.trustedProxy") : t("overview.access.connectHint")}
         </div>
         ${
           !props.connected
             ? html`
-                <div class="login-gate__help" style="margin-top: 16px;">
-                  <div class="login-gate__help-title">${t("overview.connection.title")}</div>
-                  <ol class="login-gate__steps">
-                    <li>${t("overview.connection.step1")}<code>openclaw gateway run</code></li>
-                    <li>${t("overview.connection.step2")}<code>openclaw dashboard --no-open</code></li>
-                    <li>${t("overview.connection.step3")}</li>
-                    <li>${t("overview.connection.step4")}<code>openclaw doctor --generate-gateway-token</code></li>
+                <div style="margin-top: 20px; padding: 16px; background: var(--admin-bg-color); border-radius: 8px; border: 1px solid var(--admin-border-color);">
+                  <h4 style="margin-top: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--admin-text-primary);">${t("overview.connection.title")}</h4>
+                  <ol style="margin-bottom: 12px; padding-left: 20px;">
+                    <li style="margin-bottom: 8px;">${t("overview.connection.step1")}<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 12px;">openclaw gateway run</code></li>
+                    <li style="margin-bottom: 8px;">${t("overview.connection.step2")}<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 12px;">openclaw dashboard --no-open</code></li>
+                    <li style="margin-bottom: 8px;">${t("overview.connection.step3")}</li>
+                    <li style="margin-bottom: 8px;">${t("overview.connection.step4")}<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 12px;">openclaw doctor --generate-gateway-token</code></li>
                   </ol>
-                  <div class="login-gate__docs">
+                  <div style="font-size: 14px; color: var(--admin-text-secondary);">
                     ${t("overview.connection.docsHint")}
                     <a
-                      class="session-link"
+                      style="color: var(--admin-accent-color); text-decoration: none; font-weight: 500;"
                       href="https://docs.openclaw.ai/web/dashboard"
                       target="_blank"
                       rel="noreferrer"
@@ -336,51 +371,9 @@ export function renderOverview(props: OverviewProps) {
             : nothing
         }
       </div>
+    </div>
 
-      <div class="card">
-        <div class="card-title">${t("overview.snapshot.title")}</div>
-        <div class="card-sub">${t("overview.snapshot.subtitle")}</div>
-        <div class="stat-grid" style="margin-top: 16px;">
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.status")}</div>
-            <div class="stat-value ${props.connected ? "ok" : "warn"}">
-              ${props.connected ? t("common.ok") : t("common.offline")}
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.uptime")}</div>
-            <div class="stat-value">${uptime}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.tickInterval")}</div>
-            <div class="stat-value">${tick}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${t("overview.snapshot.lastChannelsRefresh")}</div>
-            <div class="stat-value">
-              ${props.lastChannelsRefresh ? formatRelativeTimestamp(props.lastChannelsRefresh) : t("common.na")}
-            </div>
-          </div>
-        </div>
-        ${
-          props.lastError
-            ? html`<div class="callout danger" style="margin-top: 14px;">
-              <div>${props.lastError}</div>
-              ${pairingHint ?? ""}
-              ${authHint ?? ""}
-              ${insecureContextHint ?? ""}
-            </div>`
-            : html`
-                <div class="callout" style="margin-top: 14px">
-                  ${t("overview.snapshot.channelsHint")}
-                </div>
-              `
-        }
-      </div>
-    </section>
-
-    <div class="ov-section-divider"></div>
-
+    <!-- System Overview Cards -->
     ${renderOverviewCards({
       usageResult: props.usageResult,
       sessionsResult: props.sessionsResult,
@@ -391,19 +384,32 @@ export function renderOverview(props: OverviewProps) {
       onNavigate: props.onNavigate,
     })}
 
+    <!-- Attention Items -->
     ${renderOverviewAttention({ items: props.attentionItems })}
 
-    <div class="ov-section-divider"></div>
+    <!-- Event Log and System Logs -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <div class="admin-card-title">${t("overview.eventLog.title")}</div>
+        </div>
+        ${renderOverviewEventLog({
+          events: props.eventLog,
+        })}
+      </div>
 
-    <div class="ov-bottom-grid">
-      ${renderOverviewEventLog({
-        events: props.eventLog,
-      })}
-
-      ${renderOverviewLogTail({
-        lines: props.overviewLogLines,
-        onRefreshLogs: props.onRefreshLogs,
-      })}
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <div class="admin-card-title">${t("overview.logTail.title")}</div>
+          <div class="admin-card-actions">
+            <button class="admin-btn admin-btn-secondary" @click=${props.onRefreshLogs}>${t("common.refresh")}</button>
+          </div>
+        </div>
+        ${renderOverviewLogTail({
+          lines: props.overviewLogLines,
+          onRefreshLogs: props.onRefreshLogs,
+        })}
+      </div>
     </div>
 
   `;
