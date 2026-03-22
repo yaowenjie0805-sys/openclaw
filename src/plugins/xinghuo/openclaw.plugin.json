@@ -1,0 +1,25 @@
+{
+  "id": "xinghuo",
+  "name": "讯飞星火 (Xinghuo)",
+  "description": "集成讯飞星火AI模型",
+  "version": "1.0.0",
+  "enabledByDefault": true,
+  "providers": ["xinghuo"],
+  "providerAuthEnvVars": {
+    "xinghuo": ["XINGHUO_API_KEY"]
+  },
+  "providerAuthChoices": [
+    {
+      "provider": "xinghuo",
+      "method": "api-key",
+      "choiceId": "xinghuo-api-key",
+      "choiceLabel": "讯飞星火 API Key",
+      "choiceHint": "使用讯飞开放平台 API Key 进行认证",
+      "groupLabel": "国内模型",
+      "cliFlag": "--xinghuo-api-key",
+      "cliDescription": "讯飞星火 API Key",
+      "onboardingScopes": ["text-inference"]
+    }
+  ],
+  "configSchema": {}
+}

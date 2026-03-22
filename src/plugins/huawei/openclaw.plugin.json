@@ -1,0 +1,19 @@
+{
+  "id": "huawei",
+  "name": "华为MaaS",
+  "version": "1.0.0",
+  "description": "华为云ModelArts服务集成",
+  "author": "OpenClaw Team",
+  "license": "MIT",
+  "main": "index.js",
+  "openclaw": {
+    "type": "provider",
+    "providerId": "huawei",
+    "label": "华为MaaS (Huawei)",
+    "setup": "./setup.js",
+    "capabilities": {
+      "reasoning": true,
+      "input": ["text", "image"]
+    }
+  }
+}

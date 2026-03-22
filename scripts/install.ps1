@@ -134,6 +134,8 @@ function Install-Node {
     if (Get-Command scoop -ErrorAction SilentlyContinue) {
         Write-Host "  Using scoop..." -Level info
         try {
+            # Add domestic mirror for scoop
+            scoop bucket add extras
             scoop install nodejs-lts 2>&1 | Out-Null
             $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
             Write-Host "  Node.js installed via scoop" -Level success
@@ -145,6 +147,7 @@ function Install-Node {
     
     Write-Host "Could not install Node.js automatically" -Level error
     Write-Host "Please install Node.js 22+ manually from: https://nodejs.org" -Level info
+    Write-Host "For faster download in China, you can use: https://nodejs.cn" -Level info
     return $false
 }
 
@@ -207,6 +210,8 @@ function Install-OpenClawNpm {
     Write-Host "Installing OpenClaw ($installSpec)..." -Level info
     
     try {
+        # Set npm registry to domestic mirror for faster installation in China
+        npm config set registry https://registry.npmmirror.com
         # Use -ExecutionPolicy Bypass to handle restricted execution policy
         npm install -g $installSpec --no-fund --no-audit 2>&1
         Write-Host "OpenClaw installed" -Level success

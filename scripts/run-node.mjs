@@ -13,7 +13,7 @@ const runNodeSourceRoots = ["src", "extensions"];
 const runNodeConfigFiles = ["tsconfig.json", "package.json", "tsdown.config.ts"];
 export const runNodeWatchedPaths = [...runNodeSourceRoots, ...runNodeConfigFiles];
 const extensionSourceFilePattern = /\.(?:[cm]?[jt]sx?)$/;
-const extensionRestartMetadataFiles = new Set(["openclaw.plugin.json", "package.json"]);
+const extensionRestartMetadataFiles = new Set(["soloclaw.plugin.json", "package.json"]);
 
 const normalizePath = (filePath) => String(filePath ?? "").replaceAll("\\", "/");
 
@@ -86,6 +86,8 @@ const isExcludedSource = (filePath, sourceRoot, sourceRootName) => {
 const findLatestMtime = (dirPath, shouldSkip, deps) => {
   let latest = null;
   const queue = [dirPath];
+  const skipDirs = new Set(["node_modules", ".git", "dist", "build"]);
+
   while (queue.length > 0) {
     const current = queue.pop();
     if (!current) {
@@ -100,6 +102,10 @@ const findLatestMtime = (dirPath, shouldSkip, deps) => {
     for (const entry of entries) {
       const fullPath = path.join(current, entry.name);
       if (entry.isDirectory()) {
+        // 跳过不需要检查的目录，提高速度
+        if (skipDirs.has(entry.name)) {
+          continue;
+        }
         queue.push(fullPath);
         continue;
       }
@@ -211,7 +217,7 @@ const hasSourceMtimeChanged = (stampMtime, deps) => {
 };
 
 const shouldBuild = (deps) => {
-  if (deps.env.OPENCLAW_FORCE_BUILD === "1") {
+  if (deps.env.SOLOCLAW_FORCE_BUILD === "1") {
     return true;
   }
   const stamp = readBuildStamp(deps);
@@ -253,14 +259,14 @@ const shouldBuild = (deps) => {
 };
 
 const logRunner = (message, deps) => {
-  if (deps.env.OPENCLAW_RUNNER_LOG === "0") {
+  if (deps.env.SOLOCLAW_RUNNER_LOG === "0") {
     return;
   }
-  deps.stderr.write(`[openclaw] ${message}\n`);
+  deps.stderr.write(`[soloclaw] ${message}\n`);
 };
 
-const runOpenClaw = async (deps) => {
-  const nodeProcess = deps.spawn(deps.execPath, ["openclaw.mjs", ...deps.args], {
+const runSoloclaw = async (deps) => {
+  const nodeProcess = deps.spawn(deps.execPath, ["soloclaw.mjs", ...deps.args], {
     cwd: deps.cwd,
     env: deps.env,
     stdio: "inherit",
@@ -328,7 +334,7 @@ export async function runNodeMain(params = {}) {
     if (!syncRuntimeArtifacts(deps)) {
       return 1;
     }
-    return await runOpenClaw(deps);
+    return await runSoloclaw(deps);
   }
 
   logRunner("Building TypeScript (dist is stale).", deps);
@@ -353,7 +359,7 @@ export async function runNodeMain(params = {}) {
     return 1;
   }
   writeBuildStamp(deps);
-  return await runOpenClaw(deps);
+  return await runSoloclaw(deps);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

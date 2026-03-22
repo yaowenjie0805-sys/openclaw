@@ -9,13 +9,13 @@ import { normalizeWindowsArgv } from "./cli/windows-argv.js";
 import { buildCliRespawnPlan } from "./entry.respawn.js";
 import { isTruthyEnvValue, normalizeEnv } from "./infra/env.js";
 import { isMainModule } from "./infra/is-main.js";
-import { ensureOpenClawExecMarkerOnProcess } from "./infra/openclaw-exec-env.js";
+import { ensureSoloclawExecMarkerOnProcess } from "./infra/soloclaw-exec-env.js";
 import { installProcessWarningFilter } from "./infra/warning-filter.js";
 import { attachChildProcessBridge } from "./process/child-process-bridge.js";
 
 const ENTRY_WRAPPER_PAIRS = [
-  { wrapperBasename: "openclaw.mjs", entryBasename: "entry.js" },
-  { wrapperBasename: "openclaw.js", entryBasename: "entry.js" },
+  { wrapperBasename: "soloclaw.mjs", entryBasename: "entry.js" },
+  { wrapperBasename: "soloclaw.js", entryBasename: "entry.js" },
 ] as const;
 
 function shouldForceReadOnlyAuthStore(argv: string[]): boolean {
@@ -44,8 +44,8 @@ if (
   const { installGaxiosFetchCompat } = await import("./infra/gaxios-fetch-compat.js");
 
   await installGaxiosFetchCompat();
-  process.title = "openclaw";
-  ensureOpenClawExecMarkerOnProcess();
+  process.title = "soloclaw";
+  ensureSoloclawExecMarkerOnProcess();
   installProcessWarningFilter();
   normalizeEnv();
   if (!isTruthyEnvValue(process.env.NODE_DISABLE_COMPILE_CACHE)) {
@@ -88,9 +88,9 @@ if (
 
     child.once("error", (error) => {
       console.error(
-        "[openclaw] Failed to respawn CLI:",
-        error instanceof Error ? (error.stack ?? error.message) : error,
-      );
+          "[soloclaw] Failed to respawn CLI:",
+          error instanceof Error ? (error.stack ?? error.message) : error,
+        );
       process.exit(1);
     });
 
@@ -105,12 +105,12 @@ if (
     Promise.all([import("./version.js"), import("./infra/git-commit.js")])
       .then(([{ VERSION }, { resolveCommitHash }]) => {
         const commit = resolveCommitHash({ moduleUrl: import.meta.url });
-        console.log(commit ? `OpenClaw ${VERSION} (${commit})` : `OpenClaw ${VERSION}`);
+        console.log(commit ? `SoloClaw ${VERSION} (${commit})` : `SoloClaw ${VERSION}`);
         process.exit(0);
       })
       .catch((error) => {
         console.error(
-          "[openclaw] Failed to resolve version:",
+          "[soloclaw] Failed to resolve version:",
           error instanceof Error ? (error.stack ?? error.message) : error,
         );
         process.exitCode = 1;
@@ -124,7 +124,7 @@ if (
     const parsed = parseCliProfileArgs(process.argv);
     if (!parsed.ok) {
       // Keep it simple; Commander will handle rich help/errors after we strip flags.
-      console.error(`[openclaw] ${parsed.error}`);
+      console.error(`[soloclaw] ${parsed.error}`);
       process.exit(2);
     }
 
@@ -154,7 +154,7 @@ export function tryHandleRootHelpFastPath(
     deps.onError ??
     ((error: unknown) => {
       console.error(
-        "[openclaw] Failed to display help:",
+        "[soloclaw] Failed to display help:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exitCode = 1;
@@ -183,7 +183,7 @@ function runMainOrRootHelp(argv: string[]): void {
     .then(({ runCli }) => runCli(argv))
     .catch((error) => {
       console.error(
-        "[openclaw] Failed to start CLI:",
+        "[soloclaw] Failed to start CLI:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exitCode = 1;

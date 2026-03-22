@@ -1,5 +1,5 @@
 {
-  "name": "openclaw",
+  "name": "soloclaw",
   "version": "2026.3.14",
   "description": "Multi-channel AI gateway with extensible messaging integrations",
   "keywords": [],
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/openclaw/openclaw.git"
   },
   "bin": {
-    "openclaw": "openclaw.mjs"
+    "soloclaw": "soloclaw.mjs"
   },
   "directories": {
     "doc": "docs",
@@ -534,7 +534,7 @@
       "default": "./dist/plugin-sdk/zalouser.js"
     },
     "./extension-api": "./dist/extensionAPI.js",
-    "./cli-entry": "./openclaw.mjs"
+    "./cli-entry": "./soloclaw.mjs"
   },
   "scripts": {
     "android:assemble": "cd apps/android && ./gradlew :app:assemblePlayDebug",
@@ -628,8 +628,8 @@
     "mac:package": "bash scripts/package-mac-app.sh",
     "mac:restart": "bash scripts/restart-mac.sh",
     "moltbot:rpc": "node scripts/run-node.mjs agent --mode rpc --json",
-    "openclaw": "node scripts/run-node.mjs",
-    "openclaw:rpc": "node scripts/run-node.mjs agent --mode rpc --json",
+    "soloclaw": "node scripts/run-node.mjs",
+    "soloclaw:rpc": "node scripts/run-node.mjs agent --mode rpc --json",
     "plugin-sdk:check-exports": "node scripts/sync-plugin-sdk-exports.mjs --check",
     "plugin-sdk:sync-exports": "node scripts/sync-plugin-sdk-exports.mjs",
     "plugins:sync": "node --import tsx scripts/sync-plugin-versions.ts",

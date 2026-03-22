@@ -1,0 +1,25 @@
+{
+  "id": "ernie",
+  "name": "文心一言 (ERNIE)",
+  "description": "集成百度文心一言AI模型",
+  "version": "1.0.0",
+  "enabledByDefault": true,
+  "providers": ["ernie"],
+  "providerAuthEnvVars": {
+    "ernie": ["ERNIE_API_KEY"]
+  },
+  "providerAuthChoices": [
+    {
+      "provider": "ernie",
+      "method": "api-key",
+      "choiceId": "ernie-api-key",
+      "choiceLabel": "文心一言 API Key",
+      "choiceHint": "使用百度智能云 API Key 进行认证",
+      "groupLabel": "国内模型",
+      "cliFlag": "--ernie-api-key",
+      "cliDescription": "文心一言 API Key",
+      "onboardingScopes": ["text-inference"]
+    }
+  ],
+  "configSchema": {}
+}

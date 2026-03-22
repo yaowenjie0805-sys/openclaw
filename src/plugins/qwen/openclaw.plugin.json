@@ -1,0 +1,25 @@
+{
+  "id": "qwen",
+  "name": "通义千问 (Qwen)",
+  "description": "集成阿里云通义千问AI模型",
+  "version": "1.0.0",
+  "enabledByDefault": true,
+  "providers": ["qwen"],
+  "providerAuthEnvVars": {
+    "qwen": ["QWEN_API_KEY"]
+  },
+  "providerAuthChoices": [
+    {
+      "provider": "qwen",
+      "method": "api-key",
+      "choiceId": "qwen-api-key",
+      "choiceLabel": "通义千问 API Key",
+      "choiceHint": "使用阿里云 DashScope API Key 进行认证",
+      "groupLabel": "国内模型",
+      "cliFlag": "--qwen-api-key",
+      "cliDescription": "通义千问 API Key",
+      "onboardingScopes": ["text-inference"]
+    }
+  ],
+  "configSchema": {}
+}

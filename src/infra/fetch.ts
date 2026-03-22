@@ -1,4 +1,4 @@
-import { bindAbortRelay } from "../utils/fetch-timeout.js";
+import { bindAbortRelay, fetchWithTimeoutAndRetry } from "../utils/fetch-timeout.js";
 
 type FetchWithPreconnect = typeof fetch & {
   preconnect: (url: string, init?: { credentials?: RequestCredentials }) => void;
@@ -106,4 +106,39 @@ export function resolveFetch(fetchImpl?: typeof fetch): typeof fetch | undefined
     return undefined;
   }
   return wrapFetchWithAbortSignal(resolved);
+}
+
+export function createFetchWithRetry(
+  fetchImpl?: typeof fetch,
+  options?: {
+    timeoutMs?: number;
+    maxRetries?: number;
+    retryDelayMs?: number;
+    retryableStatuses?: number[];
+  },
+): typeof fetch {
+  const baseFetch = resolveFetch(fetchImpl) || fetch;
+
+  return async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input.toString();
+
+    // 对中国特定域名使用优化的超时和重试策略
+    const isChineseDomain =
+      url.includes(".cn") ||
+      url.includes("aliyun") ||
+      url.includes("huawei") ||
+      url.includes("baidu");
+
+    const defaultOptions = {
+      timeoutMs: isChineseDomain ? 15000 : 10000,
+      maxRetries: isChineseDomain ? 3 : 2,
+      retryDelayMs: isChineseDomain ? 2000 : 1000,
+      retryableStatuses: [408, 429, 500, 502, 503, 504],
+      fetchFn: baseFetch,
+    };
+
+    const finalOptions = { ...defaultOptions, ...options };
+
+    return fetchWithTimeoutAndRetry(url, init || {}, finalOptions);
+  };
 }
